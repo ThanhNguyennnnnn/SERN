@@ -1,5 +1,7 @@
 import express  from "express";
 import homeController from "../controllers/homeController";
+import userController from "../controllers/userController";
+
 
 let router = express.Router();
 
@@ -16,6 +18,19 @@ let initWebRoutes = (app) => {
     router.post("/put-crud", homeController.putCRUD);
 
     router.get("/delete-crud", homeController.deleteCRUD);
+
+
+    // API
+    router.post('/api/login', userController.handleLogin);
+    router.get('/api/get-all-user', userController.handleGetAllUsers);
+    router.post('/api/create-new-user', userController.handleCreateNewUser);
+    router.put('/api/edit-user', userController.handleEditUser);
+    router.delete('/api/delete-user', userController.handleDeleteUser); // restAPI
+
+    router.get('/api/allcode', userController.getAllCode )
+
+    //Chay theo luong router-> controller-> service 
+
     return app.use("/", router);
 }
 

@@ -4,7 +4,7 @@ const sequelize = new Sequelize('ketnoi', 'root', null, {
     host: 'localhost',
     dialect: 'mysql',
     logging: false,
-    port: 4306
+    port: 3306
 });
 
 let connectDB = async() => {
