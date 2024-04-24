@@ -35,8 +35,10 @@ app.use(function (req, res, next) {
 
 // config app
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 viewEngine(app);
 initWebRoutes(app);
@@ -45,6 +47,6 @@ connectDB();
 
 let port = process.env.PORT || 6969;
 //PORT === undefined => PORT = 6969
-app.listen(port, () =>  {
+app.listen(port, () => {
     console.log("Backend NodeJs is runing on the port: " + port);
 });

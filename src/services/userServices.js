@@ -117,8 +117,10 @@ let createNewUser = (data) => {
                     lastName: data.lastName,
                     address: data.address,
                     phoneNumber: data.phoneNumber,
-                    gender: data.gender === '1' ? true : false,
+                    gender: data.gender,
                     roleID: data.roleID,
+                    positionID: data.positionID,
+                    image: data.avatar
                 });
                 resolve({
                     errCode: 0,
@@ -167,10 +169,10 @@ let deleteUser = (userId) => {
 let updateUserData = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.id) {
+            if (!data.id || !data.roleID || !data.positionID || !data.gender) {
                 resolve({
                     errCode: 2,
-                    errMessage: 'khong tim thay id'
+                    errMessage: 'khong tim thay id, thieu tham so bat buoc'
                 })
             }
             let user = await db.User.findOne({
@@ -181,6 +183,13 @@ let updateUserData = (data) => {
                 user.firstName = data.firstName;
                 user.lastName = data.lastName;
                 user.address = data.address;
+                user.roleID = data.roleID;
+                user.positionID = data.positionID
+                user.gender = data.gender;
+                user.phoneNumber = data.phoneNumber;
+                if (data.avatar) {
+                    user.image = data.avatar;
+                }
                 await user.save();
                 resolve({
                     errCode: 0,
@@ -204,7 +213,7 @@ let getAllCodeService = (typeInput) => {
         try {
             if (!typeInput) {
                 resolve({
-                    errCode:1,
+                    errCode: 1,
                     errMessage: 'Missing required parameters'
                 })
             }
@@ -218,7 +227,7 @@ let getAllCodeService = (typeInput) => {
                 resolve(res);
             }
 
-            
+
         } catch (error) {
             reject(error)
         }
