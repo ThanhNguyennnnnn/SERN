@@ -35,6 +35,7 @@ let initWebRoutes = (app) => {
     router.post('/api/save-infor-doctors', doctorController.postInforDoctor)
     router.get('/api/get-detail-doctor-by-id', doctorController.getDetailDoctorById)
 
+    router.post('/api/bulk-create-schedule',doctorController.bulkCreateSchedule)
     //Chay theo luong router-> controller-> service 
 
     return app.use("/", router);
