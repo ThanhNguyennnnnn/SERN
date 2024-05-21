@@ -3,6 +3,7 @@ import db from "../models/index"
 require('dotenv').config();
 import _ from 'lodash';
 import e from "express";
+import { where } from "sequelize";
 
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
@@ -168,7 +169,7 @@ let bulkCreateSchedule = (data) => {
                 }
 
                 let existing = await db.Schedule.findAll(
-                   {
+                    {
                         where: { doctorID: data.doctorID, date: data.formatedDate },
                         attributes: ['timeType', 'date', 'doctorID', 'maxNumber'],
                         raw: true
@@ -185,7 +186,7 @@ let bulkCreateSchedule = (data) => {
                     return a.timeType === b.timeType && a.date === b.date;
                 })
                 // create data
-                if (toCreate && toCreate.length>0) {
+                if (toCreate && toCreate.length > 0) {
                     await db.Schedule.bulkCreate(toCreate)
                 }
 
@@ -201,10 +202,41 @@ let bulkCreateSchedule = (data) => {
     })
 }
 
+let getScheduleByDate = (doctorID, date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorID || !date) {
+                resolve({
+                    errCode: 1, 
+                    errMessage: 'Missing required parameter! '
+                })
+            }
+            else{
+                let dataSchedule = await db.Schedule.findAll({
+                    where: {
+                        doctorID: doctorID,
+                        date: date
+                    },
+                })
+                if (!dataSchedule) {
+                    dataSchedule = []
+                }
+                resolve({
+                    errCode: 0,
+                    data: dataSchedule
+                })
+            }
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
     saveDetailInforDoctor: saveDetailInforDoctor,
     getDetailDoctorById: getDetailDoctorById,
-    bulkCreateSchedule: bulkCreateSchedule
+    bulkCreateSchedule: bulkCreateSchedule,
+    getScheduleByDate: getScheduleByDate,
 }
