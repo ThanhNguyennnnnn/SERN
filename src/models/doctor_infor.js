@@ -11,6 +11,12 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
+            Doctor_infor.belongsTo(models.User, { foreignKey: 'doctorID' })
+
+            Doctor_infor.belongsTo(models.Allcode, { foreignKey: 'priceID', targetKey: 'keyMap', as: 'priceTypeData' })
+            Doctor_infor.belongsTo(models.Allcode, { foreignKey: 'provinceID', targetKey: 'keyMap', as: 'provinceTypeData' })
+            Doctor_infor.belongsTo(models.Allcode, { foreignKey: 'paymentID', targetKey: 'keyMap', as: 'paymentTypeData' })
+
         }
     };
     Doctor_infor.init({
