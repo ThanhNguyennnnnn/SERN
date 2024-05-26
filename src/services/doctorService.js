@@ -3,7 +3,6 @@ import db from "../models/index"
 require('dotenv').config();
 import _ from 'lodash';
 import e from "express";
-import { where } from "sequelize";
 
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
@@ -297,6 +296,52 @@ let getScheduleByDate = (doctorID, date) => {
     })
 }
 
+let getExtraInforDoctorById = (idInput) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!idInput) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameter! '
+                })
+            }
+            else {
+                let data = await db.Doctor_infor.findOne({
+                    where: { doctorID: idInput },
+                    attributes: {
+                        exclude: ['id', 'doctorID']
+                    },
+                    include: [
+                        {
+                            model: db.Allcode, as: 'priceTypeData',
+                            attributes: ['valueEn', 'valueVi']
+                        },
+                        {
+                            model: db.Allcode, as: 'paymentTypeData',
+                            attributes: ['valueEn', 'valueVi']
+                        },
+                        {
+                            model: db.Allcode, as: 'provinceTypeData',
+                            attributes: ['valueEn', 'valueVi']
+                        },
+                    ],
+                    raw: false,
+                    nest: true
+                })
+                if (!data) {
+                    data = {}
+                }
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
@@ -304,4 +349,5 @@ module.exports = {
     getDetailDoctorById: getDetailDoctorById,
     bulkCreateSchedule: bulkCreateSchedule,
     getScheduleByDate: getScheduleByDate,
+    getExtraInforDoctorById: getExtraInforDoctorById
 }
