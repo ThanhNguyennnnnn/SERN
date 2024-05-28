@@ -8,17 +8,17 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      statusId: {
+      statusID: {
         type: Sequelize.STRING
       },
-      doctorId: {
+      doctorID: {
         type: Sequelize.INTEGER
       },
-      patientId: {
+      patientID: {
         type: Sequelize.INTEGER
       },
       date: {
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       timeType: {
         type: Sequelize.STRING
