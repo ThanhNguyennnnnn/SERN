@@ -11,7 +11,7 @@ let handleUserLogin = (email, password) => {
             if (isExist) {
                 // Tìm 1 user trùng với điều kiện
                 let user = await db.User.findOne({
-                    attributes: ['email', 'password', 'roleId', 'firstName', 'lastName'],
+                    attributes: ['id', 'email', 'password', 'roleId', 'firstName', 'lastName'],
                     where: { email: email },
                     raw: true
                 })

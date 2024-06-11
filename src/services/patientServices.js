@@ -14,7 +14,7 @@ let postBookAppointment = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             if (!data.email || !data.doctorID || !data.timeType || !data.date
-                || !data.fullName
+                || !data.fullName || !data.selectedGender || !data.address
             ) {
                 resolve({
                     errCode: 1,
@@ -39,7 +39,10 @@ let postBookAppointment = (data) => {
                     },
                     defaults: {
                         email: data.email,
-                        roleID: 'R3'
+                        roleID: 'R3',
+                        gender: data.selectedGender,
+                        address: data.address,
+                        firstName: data.fullName
                     }
                 })
                 console.log('check user: ', user[0])

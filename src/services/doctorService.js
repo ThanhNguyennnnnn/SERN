@@ -1,8 +1,8 @@
-import { raw } from "body-parser";
+import { where } from "sequelize";
 import db from "../models/index"
 require('dotenv').config();
 import _ from 'lodash';
-import e from "express";
+import emailService from '../services/emailService'
 
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
@@ -65,7 +65,7 @@ let checkRequiredFields = (inputData) => {
             element = arrFields[i];
             break;
         }
-        
+
     }
     return {
         isValid: isValid,
@@ -442,6 +442,93 @@ let getProfileDoctorById = (inputId) => {
     })
 }
 
+let getListPatientForDoctor = (doctorID, date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorID || !date) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameter! '
+                })
+            }
+            else {
+                let data = await db.Booking.findAll({
+                    where: {
+                        statusID: 'S2',
+                        doctorID: doctorID,
+                        date: date
+                    },
+                    include: [
+                        {
+                            model: db.User, as: 'patientData',
+                            attributes: ['email', 'firstName', 'address', 'gender'],
+                            include: [
+                                {
+                                    model: db.Allcode, as: 'genderData',
+                                    attributes: ['valueEn', 'valueVi']
+                                },
+                                
+                            ]
+                        },
+                        {
+                            model: db.Allcode, as: 'timeTypeDataPatient',
+                            attributes: ['valueEn', 'valueVi']
+                        },
+                    ],
+                    raw: false,
+                    nest: true
+                })
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+let sendRemedy = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.email || !data.doctorID || !data.patientID
+                ||!data.timeType || !data.imgBase64
+            ) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameter! '
+                })
+            }
+            else {
+                //update patient status
+                let appointment = await db.Booking.findOne({
+                    where: {
+                        doctorID: data.doctorID,
+                        patientID: data.patientID,
+                        timeType: data.timeType,
+                        statusID: 'S2'
+                    },
+                    raw: false
+                })
+                if (appointment) {
+                    appointment.statusID = 'S3',
+                    await appointment.save()
+                }
+
+                // send email remedy
+                await emailService.sendAttachment(data);
+                resolve({
+                    errCode: 0,
+                    errMessage: 'OK'
+                })
+            }
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
@@ -450,5 +537,7 @@ module.exports = {
     bulkCreateSchedule: bulkCreateSchedule,
     getScheduleByDate: getScheduleByDate,
     getExtraInforDoctorById: getExtraInforDoctorById,
-    getProfileDoctorById: getProfileDoctorById
+    getProfileDoctorById: getProfileDoctorById,
+    getListPatientForDoctor: getListPatientForDoctor,
+    sendRemedy: sendRemedy
 }
